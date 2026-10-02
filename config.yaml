@@ -11,9 +11,9 @@ hcp_company_id: "8e8a0455-fbd1-4542-ad55-aa90756c5ca6"   # FUSE HVAC & APPLIANCE
 # is renamed. Slack: open the channel → name at the top → the ID is at the bottom
 # of the About tab. The bot must be invited into each one (/invite @<bot>).
 channels:
-  estimates: ""   # #fuse-monterey-parts   — every approved estimate
-  leads: ""       # #fuse_monterey_leads   — every new lead
-  daily: ""       # #chat-monterey         — yesterday's jobs per technician
+  estimates: "C08KCTD3QLA"   # #fuse-monterey-parts   — every approved estimate
+  leads: "C0C3U7RAASH"       # #fuse_monterey_leads   — every new lead
+  daily: "C074EV97XNF"       # #chat-monterey         — yesterday's jobs per technician
 
 # Links under each approved estimate. {id} is the HCP estimate / job id.
 # Empty = no link. The /app/estimates/{id} and /app/jobs/{id} guesses were broken;
