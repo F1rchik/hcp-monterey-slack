@@ -42,8 +42,10 @@ def approved_estimate(item: ApprovedOption, description: str, slack_ids: dict[st
     ]
     text = "\n".join(lines)
     blocks = [_section(text)]
-    if links.get("estimate") and est.get("id"):
-        blocks.append(_link_button("Estimate link", links["estimate"].format(id=est["id"])))
+    # The web app opens an estimate by its option id (est_…); the estimate's own
+    # csr_… id doesn't resolve there. The option is also the part that was approved.
+    if links.get("estimate") and opt.get("id"):
+        blocks.append(_link_button("Estimate link", links["estimate"].format(id=opt["id"])))
     return text, blocks
 
 

@@ -107,7 +107,7 @@ def test_approved_estimate_message_matches_manager_format():
 def test_approved_estimate_has_link_button():
     item = rules.approved_options([approved_estimate()], datetime(2026, 9, 1, tzinfo=timezone.utc))[0]
     _, blocks = messages.approved_estimate(item, "", {}, {"estimate": "https://hcp/est/{id}"})
-    assert blocks[-1]["elements"][0]["url"] == "https://hcp/est/e1"
+    assert blocks[-1]["elements"][0]["url"] == "https://hcp/est/o1"  # option id
 
 
 def test_approved_estimate_not_reposted():

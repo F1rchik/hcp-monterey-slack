@@ -17,10 +17,9 @@ channels:
 
 # Links under each approved estimate. {id} is the HCP estimate / job id.
 # {id} is the id the API returns. Empty = no link.
-# Estimates: the web app addresses them by a "best_…" id the API never returns
-# (only csr_/est_), so there is no working estimate link yet.
+# Estimates open by the approved option's id (est_…), not the estimate's csr_… id.
 links:
-  estimate: ""
+  estimate: "https://pro.housecallpro.com/app/estimates/{id}"  # est_… — confirmed 2026-10-02
   job: "https://pro.housecallpro.com/app/jobs/{id}"     # job_… — confirmed 2026-10-02
   lead: "https://pro.housecallpro.com/app/leads/{id}"   # lea_… — confirmed 2026-10-02
 
