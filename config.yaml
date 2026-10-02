@@ -16,11 +16,13 @@ channels:
   daily: "C074EV97XNF"       # #chat-monterey         — yesterday's jobs per technician
 
 # Links under each approved estimate. {id} is the HCP estimate / job id.
-# Empty = no link. The /app/estimates/{id} and /app/jobs/{id} guesses were broken;
-# fill in once the real URL pattern is copied from the HCP browser address bar.
+# {id} is the id the API returns. Empty = no link.
+# Estimates: the web app addresses them by a "best_…" id the API never returns
+# (only csr_/est_), so there is no working estimate link yet.
 links:
   estimate: ""
-  job: ""
+  job: "https://pro.housecallpro.com/app/jobs/{id}"     # job_… — confirmed 2026-10-02
+  lead: "https://pro.housecallpro.com/app/leads/{id}"   # lea_… — confirmed 2026-10-02
 
 # Live run (approved estimates + new leads).
 live:

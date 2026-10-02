@@ -21,6 +21,12 @@ def _section(text: str) -> dict:
     return {"type": "section", "text": {"type": "mrkdwn", "text": text}}
 
 
+def _link_button(label: str, url: str) -> dict:
+    return {"type": "actions", "elements": [{
+        "type": "button", "text": {"type": "plain_text", "text": label}, "url": url,
+    }]}
+
+
 def approved_estimate(item: ApprovedOption, description: str, slack_ids: dict[str, str],
                       links: dict[str, str]) -> tuple[str, list[dict]]:
     est, opt = item.estimate, item.option
@@ -37,15 +43,12 @@ def approved_estimate(item: ApprovedOption, description: str, slack_ids: dict[st
     text = "\n".join(lines)
     blocks = [_section(text)]
     if links.get("estimate") and est.get("id"):
-        blocks.append({"type": "actions", "elements": [{
-            "type": "button",
-            "text": {"type": "plain_text", "text": "Estimate link"},
-            "url": links["estimate"].format(id=est["id"]),
-        }]})
+        blocks.append(_link_button("Estimate link", links["estimate"].format(id=est["id"])))
     return text, blocks
 
 
-def new_lead(lead: dict, source: LeadSource, service: str) -> tuple[str, list[dict]]:
+def new_lead(lead: dict, source: LeadSource, service: str,
+             links: dict[str, str]) -> tuple[str, list[dict]]:
     customer = lead.get("customer")
     lines = [f"{source.emoji} *New Lead from {source.label}*".strip(),
              f"*Name:* {customer_name(customer)}"]
@@ -54,7 +57,10 @@ def new_lead(lead: dict, source: LeadSource, service: str) -> tuple[str, list[di
         lines.append(f"*Phone:* {phone}")
     lines.append(f"*Service:* {service or '—'}")
     text = "\n".join(lines)
-    return text, [_section(text)]
+    blocks = [_section(text)]
+    if links.get("lead") and lead.get("id"):
+        blocks.append(_link_button("Lead link", links["lead"].format(id=lead["id"])))
+    return text, blocks
 
 
 def _mark(ok: bool) -> str:

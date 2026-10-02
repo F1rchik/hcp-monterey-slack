@@ -100,7 +100,7 @@ def post_new_leads(s: Settings, hcp: HCPClient, out: Out, now: datetime) -> None
             service = next((i.get("name") for i in items if i.get("name")), "")
         source = rules.classify_lead_source(lead.get("lead_source"), s.lead_sources,
                                             s.default_lead_source)
-        text, blocks = messages.new_lead(lead, source, service)
+        text, blocks = messages.new_lead(lead, source, service, s.links)
         out.post(channel, text, blocks, NEW_LEAD, {
             "lead_id": str(lead.get("id")),
             "number": str(lead.get("number") or ""),

@@ -200,3 +200,11 @@ def test_daily_explicit_date_ignores_clock():
 def test_missing_channel_fails_loudly():
     with pytest.raises(RuntimeError, match="channels.leads"):
         settings(channels={}).channel("leads")
+
+
+def test_new_lead_has_link_button():
+    source = rules.LeadSource("Thumbtack", ":thumbtack:")
+    _, blocks = messages.new_lead({"id": "lea_1"}, source, "", {"lead": "https://hcp/leads/{id}"})
+    assert blocks[-1]["elements"][0]["url"] == "https://hcp/leads/lea_1"
+    _, blocks = messages.new_lead({"id": "lea_1"}, source, "", {})
+    assert len(blocks) == 1
