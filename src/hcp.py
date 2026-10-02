@@ -13,6 +13,7 @@ with the `X-Company-Id` header (location ids are listed by GET /company).
 
 from __future__ import annotations
 
+import hashlib
 import logging
 import time
 from collections.abc import Callable, Iterator
@@ -49,6 +50,8 @@ class HCPClient:
     def __init__(self, api_key: str, company_id: str = "",
                  session: requests.Session | None = None):
         self._session = session or requests.Session()
+        digest = hashlib.sha256(api_key.encode()).hexdigest()[:8]
+        self._key_fingerprint = f"{len(api_key)} chars, sha256 {digest}"
         self._session.headers.update({
             "Authorization": f"Token {api_key}",
             "Accept": "application/json",
@@ -69,9 +72,12 @@ class HCPClient:
                 time.sleep(min(wait, 30))
                 continue
             if resp.status_code == 401:
+                # Length + hash prefix let a CI failure be compared with the local key
+                # without ever printing the key itself.
                 raise RuntimeError(
                     "HCP rejected the API key (401). Check HCP_API_KEY — it is the company "
-                    "key from HCP → App Store → API, and the account must be on the MAX plan."
+                    "key from HCP → App Store → API, and the account must be on the MAX plan. "
+                    f"Key used: {self._key_fingerprint}. HCP said: {resp.text[:200]!r}"
                 )
             resp.raise_for_status()
             return resp.json()
