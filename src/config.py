@@ -57,6 +57,7 @@ class Settings:
     lead_sources: list[dict]
     default_lead_source: dict
     slack_ids: dict[str, str]   # hcp employee id → slack member id
+    estimate_cc: list[str]      # slack member ids tagged on every approved estimate
 
     def channel(self, kind: str) -> str:
         if self.test_channel:
@@ -99,4 +100,5 @@ def load_settings() -> Settings:
         slack_ids={str(t["hcp_employee_id"]): str(t["slack_user_id"])
                    for t in cfg.get("technicians") or []
                    if t.get("hcp_employee_id") and t.get("slack_user_id")},
+        estimate_cc=[str(u).strip() for u in cfg.get("estimate_cc") or [] if str(u).strip()],
     )

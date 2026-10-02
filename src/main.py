@@ -72,7 +72,10 @@ def post_approved_estimates(s: Settings, hcp: HCPClient, out: Out, now: datetime
         est_id, opt_id = str(item.estimate.get("id")), str(item.option.get("id"))
         description = rules.estimate_description(
             item.estimate, item.option, hcp.option_line_items(est_id, opt_id))
-        text, blocks = messages.approved_estimate(item, description, s.slack_ids, s.links)
+        cid = str((item.estimate.get("customer") or {}).get("id") or "")
+        job = rules.job_for_estimate(item.estimate, hcp.jobs_for_customer(cid), s.tz) if cid else None
+        text, blocks = messages.approved_estimate(item, description, job, s.slack_ids,
+                                                  s.links, s.estimate_cc)
         out.post(channel, text, blocks, APPROVED_ESTIMATE, {
             "option_id": str(item.option.get("id")),
             "estimate_id": str(item.estimate.get("id")),

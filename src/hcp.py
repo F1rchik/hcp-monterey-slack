@@ -141,6 +141,11 @@ class HCPClient:
                   "sort_direction": "desc", "page_size": 25}
         return self.get("/estimates", params).get("estimates") or []
 
+    def jobs_for_customer(self, customer_id: str) -> list[dict]:
+        params = {"customer_id": customer_id, "sort_by": "created_at",
+                  "sort_direction": "desc", "page_size": 50}
+        return self.get("/jobs", params).get("jobs") or []
+
     def job_line_items(self, job_id: str) -> list[dict]:
         return self.get(f"/jobs/{job_id}/line_items").get("data") or []
 

@@ -21,7 +21,7 @@ def settings(**kw) -> Settings:
         lookback_hours=6, estimate_max_age_days=60, post_after=time(7, 0),
         lead_sources=[{"label": "Yelp", "emoji": ":yelp:", "match": ["yelp"]}],
         default_lead_source={"label": "HCP", "emoji": ":fuse:"},
-        slack_ids={"p1": "URAY"},
+        slack_ids={"p1": "URAY"}, estimate_cc=["UOLEKSII"],
     )
     base.update(kw)
     return Settings(**base)
@@ -35,6 +35,10 @@ class FakeHCP:
 
     def recent_estimates(self, since):
         return self._estimates
+
+    def jobs_for_customer(self, cid):
+        return [{"id": "job_v", "invoice_number": "5823",
+                 "schedule": {"scheduled_start": "2026-09-18T16:00:00Z"}, "work_status": "complete rated"}]
 
     def recent_leads(self, since):
         return self._leads
@@ -81,8 +85,8 @@ RAY = {"id": "p1", "first_name": "Raymond", "last_name": "Smith"}
 
 
 def approved_estimate(option_id="o1", at="2026-09-18T14:00:00Z"):
-    return {"id": "e1", "estimate_number": "3064",
-            "customer": {"first_name": "Phil", "last_name": "Chase"},
+    return {"id": "e1", "estimate_number": "3064", "created_at": "2026-09-18T17:00:00Z",
+            "customer": {"id": "cus_1", "first_name": "Phil", "last_name": "Chase"},
             "estimate_fields": {"job_type": None},
             "assigned_employees": [RAY],
             "options": [{"id": option_id, "name": "Option #1", "total_amount": 46900,
@@ -99,14 +103,16 @@ def test_approved_estimate_message_matches_manager_format():
         "*Washer repair*",
         "*Customer Name:* Phil Chase",
         "*Estimate Number:* 3064",
+        "*Job:* <https://hcp/job/job_v|#5823>",
         "*Amount:* $469",
         "*Estimator:* <@URAY>",
+        "*CC:* <@UOLEKSII>",
     ]))
 
 
 def test_approved_estimate_has_link_button():
     item = rules.approved_options([approved_estimate()], datetime(2026, 9, 1, tzinfo=timezone.utc))[0]
-    _, blocks = messages.approved_estimate(item, "", {}, {"estimate": "https://hcp/est/{id}"})
+    _, blocks = messages.approved_estimate(item, "", None, {}, {"estimate": "https://hcp/est/{id}"}, [])
     assert blocks[-1]["elements"][0]["url"] == "https://hcp/est/o1"  # option id
 
 

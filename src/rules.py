@@ -79,6 +79,30 @@ def estimate_description(est: dict, opt: dict, line_items: list[dict]) -> str:
     return labor[0]["name"] if labor else ""
 
 
+def job_for_estimate(est: dict, customer_jobs: list[dict], tz: ZoneInfo) -> dict | None:
+    """The job an estimate belongs to, for the "Job: #5823" line.
+
+    The API has no estimate → job link. The estimate is written on a visit, so
+    take the customer's latest job scheduled on or before the estimate's day.
+    An estimate written before any visit (office estimate) gets the next job
+    scheduled after it instead, usually the work booked from it.
+    """
+    created = parse_ts(est.get("created_at"))
+    if created is None:
+        return None
+    day = created.astimezone(tz).date()
+    dated = []
+    for job in customer_jobs:
+        start = parse_ts((job.get("schedule") or {}).get("scheduled_start"))
+        if start is not None and not is_canceled(job):
+            dated.append((start, job))
+    before = [(s, j) for s, j in dated if s.astimezone(tz).date() <= day]
+    if before:
+        return max(before, key=lambda sj: sj[0])[1]
+    after = [(s, j) for s, j in dated if s.astimezone(tz).date() > day]
+    return min(after, key=lambda sj: sj[0])[1] if after else None
+
+
 def money(cents: int | float | None) -> str:
     if cents is None:
         return "—"

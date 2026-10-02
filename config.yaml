@@ -61,6 +61,10 @@ default_lead_source:
   label: HCP
   emoji: ":fuse:"
 
+# Tagged on every approved estimate ("CC:" line), so parts can be ordered.
+estimate_cc:
+  - "U08KE5YMJ8L"   # Oleksii Parts Monterey (Assiya, 2026-10-02) — not "Oleksii Warehouse"
+
 # HCP employee → Slack member, for the @mention on the daily report and on
 # "Estimator". Fill with: python scripts/suggest_slack_ids.py
 # Anyone missing here still gets their jobs posted, with their name in bold.
@@ -76,7 +80,7 @@ technicians:
     slack_user_id: "U09B1QJJ856"      # Juan Technician Monterey
   - hcp_employee_id: "pro_2077d63bcb614d13bc7c7f613efdb408"
     name: "Bobby J. Bailey"           # field tech
-    slack_user_id: ""                 # TODO: not found in Slack
+    slack_user_id: "U0AMW9PAZPY"      # Bobby Technician Monterey (Assiya, 2026-10-02)
   - hcp_employee_id: "pro_61322f15cf5a41fea44c6bdf4c2894e7"
     name: "Nick Beschasnyi"           # admin, also runs jobs
     slack_user_id: "U05QJT96HBP"      # Mykola Monterey (confirmed by Assiya, 2026-09-28)

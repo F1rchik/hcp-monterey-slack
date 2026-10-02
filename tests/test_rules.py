@@ -187,3 +187,26 @@ def test_group_by_technician_shared_and_unassigned_jobs():
     reports = rules.group_by_technician(jobs)
     assert [(r.name, [j["id"] for j in r.jobs]) for r in reports] == [
         ("Alan B", ["a"]), ("Raymond T", ["a", "b"]), ("Unassigned", ["c"])]
+
+
+def _cjob(num, start, status="complete rated"):
+    return {"id": f"job_{num}", "invoice_number": num, "work_status": status,
+            "schedule": {"scheduled_start": start}}
+
+
+def test_job_for_estimate_takes_latest_visit_on_or_before_estimate_day():
+    # #3093 Lauerman: old job 08-18, visit 09-28, follow-up 10-02; estimate 09-28 evening.
+    est = {"created_at": "2026-09-29T02:19:00Z"}  # 09-28 19:19 PDT
+    jobs = [_cjob("5546", "2026-08-18T17:00:00Z"), _cjob("5854-1", "2026-09-28T17:00:00Z"),
+            _cjob("5854-2", "2026-10-02T17:00:00Z", "scheduled")]
+    assert rules.job_for_estimate(est, jobs, TZ)["invoice_number"] == "5854-1"
+
+
+def test_job_for_estimate_office_estimate_gets_next_job_and_skips_canceled():
+    est = {"created_at": "2026-09-30T18:48:00Z"}
+    jobs = [_cjob("5890", "2026-10-10T17:00:00Z", "pro canceled"),
+            _cjob("5896-2", "2026-10-16T17:00:00Z", "scheduled"),
+            _cjob("5896-1", "2026-10-15T17:00:00Z", "scheduled"),
+            {"id": "job_x", "invoice_number": "5878", "schedule": {}}]
+    assert rules.job_for_estimate(est, jobs, TZ)["invoice_number"] == "5896-1"
+    assert rules.job_for_estimate(est, [], TZ) is None
