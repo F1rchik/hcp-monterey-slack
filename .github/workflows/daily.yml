@@ -1,0 +1,46 @@
+name: Daily — yesterday's jobs per technician
+
+on:
+  schedule:
+    # Three tries, 14:15 / 15:15 / 16:15 UTC. The code posts only once local time
+    # is past daily.post_after (07:00) and skips technicians already posted for
+    # that day — so this lands ~07:15 in both PDT and PST with no winter edit,
+    # and a late or doubled GitHub run can't post twice.
+    - cron: '15 14,15,16 * * *'
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'Report this day instead of yesterday (YYYY-MM-DD)'
+        type: string
+        default: ''
+      dry_run:
+        description: 'Print instead of posting'
+        type: boolean
+        default: false
+      test_channel:
+        description: 'Test: post to this channel ID instead of #chat-monterey'
+        type: string
+        default: ''
+
+concurrency:
+  group: hcp-daily
+  cancel-in-progress: false
+
+jobs:
+  run:
+    if: github.event_name == 'workflow_dispatch' || vars.HCP_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python src/main.py daily ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
+        env:
+          HCP_API_KEY: ${{ secrets.HCP_API_KEY }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          SLACK_TEST_CHANNEL: ${{ inputs.test_channel }}

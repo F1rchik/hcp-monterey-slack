@@ -1,0 +1,4 @@
+requests>=2.32
+PyYAML>=6.0
+slack-sdk>=3.33
+tzdata>=2024.2 ; sys_platform == "win32"

@@ -1,0 +1,45 @@
+name: Hourly — approved estimates & new leads
+
+on:
+  schedule:
+    # Hourly, ~06:00–21:00 Pacific. Cron is UTC and ignores daylight saving,
+    # so the hours cover both PDT and PST; an extra run outside hours posts only
+    # what is genuinely new. Runs are often 10–60 min late — lookback_hours in
+    # config.yaml is sized for that, and Slack history prevents repeats.
+    # Actions budget: ~16 runs/day ≈ 500 billed minutes/month on a private repo.
+    - cron: '0 0-4,13-23 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Print instead of posting'
+        type: boolean
+        default: false
+      test_channel:
+        description: 'Test: post everything to this channel ID instead'
+        type: string
+        default: ''
+
+concurrency:
+  # Two overlapping runs would both read history before either posts.
+  group: hcp-live
+  cancel-in-progress: false
+
+jobs:
+  run:
+    # Schedule is off until Variable HCP_ENABLED=true; manual runs always work.
+    if: github.event_name == 'workflow_dispatch' || vars.HCP_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python src/main.py live
+        env:
+          HCP_API_KEY: ${{ secrets.HCP_API_KEY }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          SLACK_TEST_CHANNEL: ${{ inputs.test_channel }}

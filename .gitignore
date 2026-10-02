@@ -1,0 +1,16 @@
+# Secrets
+.env
+
+# HCP dumps from scripts/inspect_hcp.py: customer names and phones
+data/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/

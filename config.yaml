@@ -1,0 +1,92 @@
+# HCP → Slack notifications for FUSE HVAC & APPLIANCE REPAIR MONTEREY INC.
+# Everything a manager may want to change lives here; secrets live in .env / GitHub.
+
+timezone: America/Los_Angeles
+
+# The HCP API key is for the Fuse parent account; this picks the Monterey location
+# (sent as X-Company-Id). Other locations: GET /company → locations.
+hcp_company_id: "8e8a0455-fbd1-4542-ad55-aa90756c5ca6"   # FUSE HVAC & APPLIANCE REPAIR MONTEREY INC
+
+# Channel IDs, not names: all three are private, and an ID can't drift when a channel
+# is renamed. Slack: open the channel → name at the top → the ID is at the bottom
+# of the About tab. The bot must be invited into each one (/invite @<bot>).
+channels:
+  estimates: ""   # #fuse-monterey-parts   — every approved estimate
+  leads: ""       # #fuse_monterey_leads   — every new lead
+  daily: ""       # #chat-monterey         — yesterday's jobs per technician
+
+# Links under each approved estimate. {id} is the HCP estimate / job id.
+# Empty = no link. The /app/estimates/{id} and /app/jobs/{id} guesses were broken;
+# fill in once the real URL pattern is copied from the HCP browser address bar.
+links:
+  estimate: ""
+  job: ""
+
+# Live run (approved estimates + new leads).
+live:
+  # How far back each run looks. Anything older was either posted already or is
+  # older than we care about; Slack history makes repeats impossible either way.
+  # Generous because GitHub cron runs are routinely 30–60 min late.
+  lookback_hours: 6
+  # Estimates are scanned by creation date; an approval of an estimate older than
+  # this is missed. 60 days covers the usual "customer thinks it over" gap.
+  estimate_max_age_days: 60
+
+# Daily report: yesterday's jobs, posted once, after this local time.
+daily:
+  post_after: "07:00"
+
+# Lead source → Slack header. First entry whose `match` text appears in HCP's
+# lead_source wins (case-insensitive). Emoji must exist in the workspace.
+lead_sources:
+  - label: Yelp
+    emoji: ":yelp:"
+    match: [yelp]
+  - label: Thumbtack
+    emoji: ":thumbtack:"
+    match: [thumbtack]
+  - label: GLS
+    emoji: ":googleads:"
+    match: [google, gls, lsa, local services]
+  - label: eLocal
+    emoji: ":elocal-house:"
+    match: [elocal]
+  - label: Angi
+    # Built-in emoji: there is no custom :angi: in the workspace. Swap for a custom
+    # one if someone uploads the Angi logo.
+    emoji: ":house_with_garden:"
+    match: [angi]
+default_lead_source:
+  label: HCP
+  emoji: ":fuse:"
+
+# HCP employee → Slack member, for the @mention on the daily report and on
+# "Estimator". Fill with: python scripts/suggest_slack_ids.py
+# Anyone missing here still gets their jobs posted, with their name in bold.
+technicians:
+  - hcp_employee_id: "pro_84f2a78e42e444e3ad2c434c1c0b923a"
+    name: "Raymond Miller"            # field tech
+    slack_user_id: "U0BP2Q63LSU"      # Raymond Technician Monterey
+  - hcp_employee_id: "pro_7224db4e00324b7b92ba730d6267a36c"
+    name: "Melvin Morales"            # field tech
+    slack_user_id: "U09E283963D"      # Melvin Technician Monterey
+  - hcp_employee_id: "pro_2b21f68fb66a40c99d83ed1b52e44837"
+    name: "Juan Alvarez"              # field tech
+    slack_user_id: "U09B1QJJ856"      # Juan Technician Monterey
+  - hcp_employee_id: "pro_2077d63bcb614d13bc7c7f613efdb408"
+    name: "Bobby J. Bailey"           # field tech
+    slack_user_id: ""                 # TODO: not found in Slack
+  - hcp_employee_id: "pro_61322f15cf5a41fea44c6bdf4c2894e7"
+    name: "Nick Beschasnyi"           # admin, also runs jobs
+    slack_user_id: "U05QJT96HBP"      # Mykola Monterey (confirmed by Assiya, 2026-09-28)
+  - hcp_employee_id: "pro_45c5f762b4824127baa1da22841bd988"
+    name: "Aaron Sultan"              # office staff
+    slack_user_id: "U0A1JTAVA4F"      # Aaron Sales Monterey
+  - hcp_employee_id: "pro_718b4944e77f4c80a36ccb7b2eaa97d5"
+    name: "Natalie Franzen"           # office staff
+    slack_user_id: "U08BHS4J00K"      # Natalie Operator Monterey
+  - hcp_employee_id: "pro_41b35284abe4411f9725c92e558f23bf"
+    name: "Andrew Kniazhev"           # admin
+    slack_user_id: "U06CP93GW5Q"      # Andrew Manager Monterey
+  # Dmytro Netrocket (office, pro_7716ad21eeb04c8c815b1f616b6d21a0) — "Dmytro San Jose"? unconfirmed
+  # Alexis Kniazhev (office, pro_709015d748aa4cbcaeb671dba7ca557b) — not found in Slack
