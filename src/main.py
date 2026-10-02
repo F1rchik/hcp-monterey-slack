@@ -139,6 +139,9 @@ def post_daily(s: Settings, hcp: HCPClient, out: Out, now: datetime, day: date |
             for p in out.posted(channel, DAILY_JOBS, start - timedelta(days=1))}
 
     for report in rules.group_by_technician(jobs):
+        if report.employee_id in s.exclude_employees:
+            log.info("daily: %s excluded in config", report.name)
+            continue
         if (day.isoformat(), report.employee_id) in done:
             log.info("daily: %s already posted", report.name)
             continue

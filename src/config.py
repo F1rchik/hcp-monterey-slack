@@ -54,6 +54,7 @@ class Settings:
     lookback_hours: float
     estimate_max_age_days: int
     post_after: time
+    exclude_employees: set[str]  # hcp employee ids left out of the daily report
     lead_sources: list[dict]
     default_lead_source: dict
     slack_ids: dict[str, str]   # hcp employee id → slack member id
@@ -95,6 +96,7 @@ def load_settings() -> Settings:
         lookback_hours=float(live.get("lookback_hours", 6)),
         estimate_max_age_days=int(live.get("estimate_max_age_days", 60)),
         post_after=time.fromisoformat(str(daily.get("post_after", "07:00"))),
+        exclude_employees={str(e).strip() for e in daily.get("exclude_employees") or []},
         lead_sources=cfg.get("lead_sources") or [],
         default_lead_source=cfg.get("default_lead_source") or {"label": "HCP", "emoji": ""},
         slack_ids={str(t["hcp_employee_id"]): str(t["slack_user_id"])

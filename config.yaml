@@ -36,6 +36,10 @@ live:
 # Daily report: yesterday's jobs, posted once, after this local time.
 daily:
   post_after: "07:00"
+  # HCP employees who get no report of their own. A job they share with another
+  # tech still appears in that tech's report.
+  exclude_employees:
+    - "pro_61322f15cf5a41fea44c6bdf4c2894e7"   # Nick Beschasnyi = @Mykola Monterey (Assiya, 2026-10-02)
 
 # Lead source → Slack header. First entry whose `match` text appears in HCP's
 # lead_source wins (case-insensitive). Emoji must exist in the workspace.

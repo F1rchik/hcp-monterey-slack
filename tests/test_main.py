@@ -21,7 +21,7 @@ def settings(**kw) -> Settings:
         lookback_hours=6, estimate_max_age_days=60, post_after=time(7, 0),
         lead_sources=[{"label": "Yelp", "emoji": ":yelp:", "match": ["yelp"]}],
         default_lead_source={"label": "HCP", "emoji": ":fuse:"},
-        slack_ids={"p1": "URAY"}, estimate_cc=["UOLEKSII"],
+        slack_ids={"p1": "URAY"}, estimate_cc=["UOLEKSII"], exclude_employees=set(),
     )
     base.update(kw)
     return Settings(**base)
@@ -214,3 +214,9 @@ def test_new_lead_has_link_button():
     assert blocks[-1]["elements"][0]["url"] == "https://hcp/leads/lea_1"
     _, blocks = messages.new_lead({"id": "lea_1"}, source, "", {})
     assert len(blocks) == 1
+
+
+def test_daily_skips_excluded_employee():
+    out = FakeOut()
+    main.post_daily(settings(exclude_employees={"p1"}), FakeHCP(jobs=daily_jobs()), out, NOW, None)
+    assert out.sent == []
