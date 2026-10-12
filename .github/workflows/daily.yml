@@ -2,11 +2,11 @@ name: Daily — yesterday's jobs per technician
 
 on:
   schedule:
-    # Three tries, 14:15 / 15:15 / 16:15 UTC. The code posts only once local time
-    # is past daily.post_after (07:00) and skips technicians already posted for
-    # that day — so this lands ~07:15 in both PDT and PST with no winter edit,
-    # and a late or doubled GitHub run can't post twice.
-    - cron: '15 14,15,16 * * *'
+    # Hourly tries 14:23–20:23 UTC (07:23–13:23 PDT / 06:23–12:23 PST). GitHub
+    # drops many scheduled runs, so several tries are needed for one to land.
+    # The code posts only once local time is past daily.post_after (07:00) and
+    # skips technicians already posted for that day, so extra runs do nothing.
+    - cron: '23 14-20 * * *'
   workflow_dispatch:
     inputs:
       date:

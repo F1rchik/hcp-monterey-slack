@@ -25,10 +25,11 @@ links:
 
 # Live run (approved estimates + new leads).
 live:
-  # How far back each run looks. Anything older was either posted already or is
-  # older than we care about; Slack history makes repeats impossible either way.
-  # Generous because GitHub cron runs are routinely 30–60 min late.
-  lookback_hours: 6
+  # How far back each run looks for approvals. Slack history makes repeats
+  # impossible, so this only needs to outlast the longest gap between runs.
+  # GitHub skips scheduled runs freely: Oct 2–12 had gaps up to 14.5h, and with
+  # the old 6h window 5 approvals fell into gaps and were never posted.
+  lookback_hours: 72
   # Estimates are scanned by creation date; an approval of an estimate older than
   # this is missed. 60 days covers the usual "customer thinks it over" gap.
   estimate_max_age_days: 60

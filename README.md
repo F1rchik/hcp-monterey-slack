@@ -29,7 +29,7 @@ stored.
 **Approved estimate.** An estimate *option* whose `approval_status` contains
 "approv". That covers both the customer approving through the link and the tech
 marking it "pro approved". The approval time is the option's
-`approval_status_updated_at`. Each run looks back `live.lookback_hours` (6h). One
+`approval_status_updated_at`. Each run looks back `live.lookback_hours` (72h — GitHub skips scheduled runs, so the window must outlast the gaps). One
 message goes out per approved option, with an **Estimate link** button.
 Description: the estimate's job type, otherwise the option name if it isn't the
 default "Option #1", otherwise the first labor line item. Monterey leaves job type
@@ -129,7 +129,7 @@ copy .env.example .env          # fill in the keys, keep DRY_RUN=1
   only the newest lead as a baseline.
 - **Old estimates.** Estimates are scanned by creation date,
   `live.estimate_max_age_days` (60) back. An approval of an older estimate is missed.
-- **Actions budget.** Hourly live runs ≈ 500 billed minutes/month on a private repo.
+- **Actions budget.** Hourly live runs (24/day at :17) ≈ 720 billed minutes/month on a private repo.
 - **Why polling, not HCP webhooks.** HCP (MAX plan) can push events to one URL, and
   that would make posts instant. It would also need a public endpoint running 24/7
   and a second codebase, and events are lost if that endpoint is down. The daily

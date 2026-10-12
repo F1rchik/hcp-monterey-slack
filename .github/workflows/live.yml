@@ -2,12 +2,12 @@ name: Hourly — approved estimates & new leads
 
 on:
   schedule:
-    # Hourly, ~06:00–21:00 Pacific. Cron is UTC and ignores daylight saving,
-    # so the hours cover both PDT and PST; an extra run outside hours posts only
-    # what is genuinely new. Runs are often 10–60 min late — lookback_hours in
-    # config.yaml is sized for that, and Slack history prevents repeats.
-    # Actions budget: ~16 runs/day ≈ 500 billed minutes/month on a private repo.
-    - cron: '0 0-4,13-23 * * *'
+    # Every hour at :17, around the clock. GitHub drops scheduled runs under load
+    # (worst at :00), and in practice ran this only 2–5 times a day with gaps up
+    # to 14.5h. Off-peak minute + 24 tries/day keeps posts close to hourly; the
+    # 72h lookback in config.yaml means a skipped run delays a post, never loses it.
+    # Actions budget: ~24 runs/day ≈ 720 billed minutes/month on a private repo.
+    - cron: '17 * * * *'
   workflow_dispatch:
     inputs:
       dry_run:
