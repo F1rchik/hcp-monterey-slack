@@ -1,12 +1,10 @@
 name: Daily — yesterday's jobs per technician
 
 on:
-  schedule:
-    # Hourly tries 14:23–20:23 UTC (07:23–13:23 PDT / 06:23–12:23 PST). GitHub
-    # drops many scheduled runs, so several tries are needed for one to land.
-    # The code posts only once local time is past daily.post_after (07:00) and
-    # skips technicians already posted for that day, so extra runs do nothing.
-    - cron: '23 14-20 * * *'
+  # No schedule here any more. GitHub ran scheduled jobs only 4-7 times a day
+  # (gaps up to 8h), so production runs from Windows Task Scheduler on the ETL VM
+  # (scripts/run_bot.ps1 daily). Keep this workflow for manual runs and as a fallback;
+  # don't add a schedule back while the VM task is active, or both would post.
   workflow_dispatch:
     inputs:
       date:

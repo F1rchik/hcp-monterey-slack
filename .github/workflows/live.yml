@@ -1,13 +1,10 @@
 name: Hourly — approved estimates & new leads
 
 on:
-  schedule:
-    # Every hour at :17, around the clock. GitHub drops scheduled runs under load
-    # (worst at :00), and in practice ran this only 2–5 times a day with gaps up
-    # to 14.5h. Off-peak minute + 24 tries/day keeps posts close to hourly; the
-    # 72h lookback in config.yaml means a skipped run delays a post, never loses it.
-    # Actions budget: ~24 runs/day ≈ 720 billed minutes/month on a private repo.
-    - cron: '17 * * * *'
+  # No schedule here any more. GitHub ran scheduled jobs only 4-7 times a day
+  # (gaps up to 8h), so production runs from Windows Task Scheduler on the ETL VM
+  # (scripts/run_bot.ps1 live). Keep this workflow for manual runs and as a fallback;
+  # don't add a schedule back while the VM task is active, or both would post.
   workflow_dispatch:
     inputs:
       dry_run:

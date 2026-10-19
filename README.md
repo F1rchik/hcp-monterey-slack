@@ -9,7 +9,7 @@ REPAIR MONTEREY INC** (requested by Assiya, 2026-09-24):
 | Every new lead, labelled by source (Angi / Thumbtack / Yelp / GLS / eLocal / HCP) | `#fuse_monterey_leads` | within ~1 hour |
 | Yesterday's jobs, one message per technician: Estimate / Photos / Paid | `#chat-monterey` | daily ~07:15 PT |
 
-Runs on GitHub Actions, like `Operators` and `asbestos`. There is no server and no database.
+Runs from **Windows Task Scheduler on the ETL VM** (`scripts/run_bot.ps1`): estimates and leads every 15 min, the daily report at 07:05 (retry 09:05). GitHub Actions keeps the same workflows for manual runs and tests; its own scheduler skipped most runs (4–7 of 24 a day), so it no longer schedules anything.
 
 ```
 HCP public API (read-only) ──► src/main.py live   ──► #fuse-monterey-parts, #fuse_monterey_leads
@@ -122,6 +122,14 @@ copy .env.example .env          # fill in the keys, keep DRY_RUN=1
 4. **Turn it on.** Set `HCP_ENABLED=true`.
 
 ## Things to know
+
+- **Where it runs.** Two Task Scheduler tasks on the VM, "HCP Monterey - estimates and
+  leads" (every 15 min) and "HCP Monterey - daily jobs report" (07:05, 09:05), both
+  "run whether logged on or not" (S4U). They run this working copy, so a change
+  is live once it's saved here; `git pull` after editing elsewhere. Logs:
+  `logs/bot-YYYY-MM.log`. `.env` here must hold the real keys; the wrapper forces
+  `DRY_RUN=0` and clears `SLACK_TEST_CHANNEL`, so local testing settings in `.env`
+  don't leak into production.
 
 - **Leads without `created_at`.** The spec's Lead object doesn't list it. If the
   live API doesn't return it either, the code falls back to lead numbers: it posts

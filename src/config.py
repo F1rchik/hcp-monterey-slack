@@ -26,6 +26,9 @@ def load_env_file(path: Path = ENV_FILE) -> None:
             continue
         key, _, value = line.partition("=")
         value = value.strip()
+        # Trailing "   # note" comments, as in the README's .env examples.
+        if " #" in value and not value.startswith(("'", '"')):
+            value = value.split(" #", 1)[0].rstrip()
         if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
             value = value[1:-1]
         os.environ.setdefault(key.strip(), value)
